@@ -1,4 +1,4 @@
-package com.echostream.orangebot.web;
+package com.echostream.orangebot.controller;
 
 import com.echostream.orangebot.api.TelegramApi;
 import com.echostream.orangebot.dto.telegram.MessageDto;
@@ -10,14 +10,17 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import retrofit2.Response;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
@@ -25,7 +28,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/telegram")
-public class TelegramWeb {
+public class TelegramController {
     @Value("${telegram.bot.token}")
     private String botToken;
     @Value("${telegram.bot.name}")
@@ -37,7 +40,7 @@ public class TelegramWeb {
     @ApiOperation("telegram消息监听")
     @PostMapping("listener/{token}")
     public String listener(@PathVariable("token") String token,
-                           @Valid @RequestBody UpdateDto update) {
+                           @Valid @RequestBody UpdateDto update) throws IOException {
         ForbiddenException.isTrue(botToken.equals(token), "路径错误");
         if (update.getMessage() != null) {
             Integer chatId = update.getMessage().getChat().getId();
@@ -58,7 +61,8 @@ public class TelegramWeb {
                     SentMessageDto sentMessage = new SentMessageDto();
                     sentMessage.setChatId(chatId);
                     sentMessage.setText(sdf.format(new Date()));
-                    telegramApi.sendMessage(sentMessage);
+                    Response<MessageDto> response = telegramApi.sendMessage(sentMessage).execute();
+                    Assert.state(response.isSuccessful(), response.errorBody().toString());
                     break;
                 case SCHEDULER:
                     break;

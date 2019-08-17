@@ -1,7 +1,7 @@
 package com.echostream.orangebot;
 
 import com.echostream.orangebot.dto.telegram.GetUpdateDto;
-import com.echostream.orangebot.http.TelegramInterface;
+import com.echostream.orangebot.api.TelegramApi;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.Collections;
 @ActiveProfiles(value = "test")
 public class OrangebotApplicationTests {
     @Autowired
-    private TelegramInterface telegramInterface;
+    private TelegramApi telegramApi;
 
     @Test
     public void contextLoads() {
@@ -25,13 +25,13 @@ public class OrangebotApplicationTests {
 
     @Test
     public void testGetUpdate() throws IOException {
-        System.out.println("telegramInterface = " + telegramInterface);
+        System.out.println("telegramApi = " + telegramApi);
         GetUpdateDto getUpdateDto = new GetUpdateDto();
         getUpdateDto.setAllowedUpdates(Collections.emptyList());
         getUpdateDto.setLimit(1);
         getUpdateDto.setOffset(0);
         getUpdateDto.setTimeout(0);
-//        List<UpdateDto> result = telegramInterface.getUpdate(getUpdateDto).execute().body();
+//        List<UpdateDto> result = telegramApi.getUpdate(getUpdateDto).execute().body();
 //        System.out.println("result = " + result);
     }
 }

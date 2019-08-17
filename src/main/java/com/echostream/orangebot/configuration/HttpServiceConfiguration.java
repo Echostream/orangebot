@@ -1,5 +1,6 @@
-package com.echostream.orangebot.http;
+package com.echostream.orangebot.configuration;
 
+import com.echostream.orangebot.api.TelegramApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,12 +13,12 @@ public class HttpServiceConfiguration {
     private String botToken;
 
     @Bean
-    public TelegramInterface getTelegramInterface() {
+    public TelegramApi getTelegramInterface() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.telegram.org/bot" + botToken + "/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        return retrofit.create(TelegramInterface.class);
+        return retrofit.create(TelegramApi.class);
     }
 }
