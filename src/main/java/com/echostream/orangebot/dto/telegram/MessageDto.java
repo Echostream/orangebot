@@ -171,7 +171,7 @@ public class MessageDto {
 
     @Data
     public static class Command {
-        private final static Pattern commandPattern = Pattern.compile("^(?:/([a-z0-9_]+)(@[a-z0-9_]+)?(?:\\s+(.*))?)$");
+        private final static Pattern commandPattern = Pattern.compile("^(/[a-z0-9_]*)?(@[a-z0-9_]+)?(.*)$");
 
         private String command;
         private String commandOwner;
@@ -180,10 +180,12 @@ public class MessageDto {
         public Command(){}
 
         public Command(String text){
-            Matcher comamndMather = commandPattern.matcher(text);
-            this.command = comamndMather.group(1);
-            this.commandOwner = comamndMather.group(2);
-            this.commandParams = comamndMather.group(3);
+            Matcher cmdMatcher = commandPattern.matcher(text);
+            if (cmdMatcher.find()) {
+                this.command = cmdMatcher.group(1);
+                this.commandOwner = cmdMatcher.group(2);
+                this.commandParams = cmdMatcher.group(3);
+            }
         }
     }
 

@@ -5,11 +5,11 @@ import lombok.Getter;
 import java.io.Serializable;
 
 public class IResponse<T> implements Serializable {
-    public static final Integer SUCCESS = 200;
-    public static final Integer BAD_REQUEST = 400;
-    public static final Integer UNAUTHORIZED = 401;
-    public static final Integer FORBIDDEN = 403;
-    public static final Integer INTERNAL_ERROR = 500;
+    private static final Integer SUCCESS = 200;
+    private static final Integer BAD_REQUEST = 400;
+    private static final Integer UNAUTHORIZED = 401;
+    private static final Integer FORBIDDEN = 403;
+    private static final Integer INTERNAL_ERROR = 500;
 
     @Getter
     private Integer code = SUCCESS;

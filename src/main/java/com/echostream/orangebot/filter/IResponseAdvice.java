@@ -1,18 +1,18 @@
 package com.echostream.orangebot.filter;
 
+import com.alibaba.fastjson.JSON;
 import com.echostream.orangebot.dto.common.IResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@ControllerAdvice(basePackages = "com.echostream.orangebot.web")
+@RestControllerAdvice(basePackages = "com.echostream.orangebot.web")
 public class IResponseAdvice implements ResponseBodyAdvice<Object> {
 
-  
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         return true;
@@ -22,6 +22,9 @@ public class IResponseAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType,
                                   MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request, ServerHttpResponse response) {
+        if (body instanceof String){
+            return JSON.toJSONString(IResponse.success(body));
+        }
         return IResponse.success(body);
     }
 
