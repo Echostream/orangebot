@@ -11,7 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
@@ -22,15 +26,13 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/telegram")
 public class TelegramWeb {
-
-
     @Value("${telegram.bot.token}")
     private String botToken;
     @Value("${telegram.bot.name}")
     private String botName;
 
     @Autowired
-    TelegramApi telegramApi;
+    private TelegramApi telegramApi;
 
     @ApiOperation("telegram消息监听")
     @PostMapping("listener/{token}")
@@ -44,7 +46,7 @@ public class TelegramWeb {
                 return "ok";
             }
             MessageDto.Command command = optCommand.get();
-            if (StringUtils.isEmpty(command.getCommand())){
+            if (StringUtils.isEmpty(command.getCommand())) {
                 return "ok";
             }
             if (!StringUtils.isEmpty(command.getCommandOwner()) && !botName.equals(command.getCommandOwner())) {
@@ -65,6 +67,4 @@ public class TelegramWeb {
         }
         return "ok";
     }
-
-
 }
