@@ -7,6 +7,7 @@ import com.echostream.orangebot.dto.telegram.UpdateDto;
 import com.echostream.orangebot.dto.telegram.request.SentMessageDto;
 import com.echostream.orangebot.enums.TgCmdEnum;
 import com.echostream.orangebot.exception.ForbiddenException;
+import com.echostream.orangebot.exception.InternalErrorException;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import retrofit2.Call;
 import retrofit2.Response;
 
 import javax.validation.Valid;
@@ -63,8 +65,9 @@ public class TelegramController {
                     SentMessageDto sentMessage = new SentMessageDto();
                     sentMessage.setChatId(chatId);
                     sentMessage.setText(sdf.format(new Date()));
-                    Response<MessageDto> response = telegramApi.sendMessage(sentMessage).execute();
-                    Assert.state(response.isSuccessful(), JSON.toJSONString(response.errorBody()));
+                    Call<MessageDto> messageDtoCall = telegramApi.sendMessage(sentMessage);
+                    Response<MessageDto> response = messageDtoCall.execute();
+                    InternalErrorException.isTrue(response.isSuccessful(), response.errorBody().string());
                     break;
                 case SCHEDULER:
                     break;

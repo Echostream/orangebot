@@ -15,7 +15,7 @@ public class HttpServiceConfiguration {
     @Bean
     public TelegramApi getTelegramInterface() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.telegram.org/bot" + botToken + "/")
+                .baseUrl(String.format("https://api.telegram.org/bot%s/", botToken))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
