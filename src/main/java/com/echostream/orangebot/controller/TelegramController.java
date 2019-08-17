@@ -1,5 +1,6 @@
 package com.echostream.orangebot.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.echostream.orangebot.api.TelegramApi;
 import com.echostream.orangebot.dto.telegram.MessageDto;
 import com.echostream.orangebot.dto.telegram.UpdateDto;
@@ -41,6 +42,7 @@ public class TelegramController {
     @PostMapping("listener/{token}")
     public String listener(@PathVariable("token") String token,
                            @Valid @RequestBody UpdateDto update) throws IOException {
+        log.info("telegram update: {}",update);
         ForbiddenException.isTrue(botToken.equals(token), "路径错误");
         if (update.getMessage() != null) {
             Integer chatId = update.getMessage().getChat().getId();
@@ -62,7 +64,7 @@ public class TelegramController {
                     sentMessage.setChatId(chatId);
                     sentMessage.setText(sdf.format(new Date()));
                     Response<MessageDto> response = telegramApi.sendMessage(sentMessage).execute();
-                    Assert.state(response.isSuccessful(), response.errorBody().toString());
+                    Assert.state(response.isSuccessful(), JSON.toJSONString(response.errorBody()));
                     break;
                 case SCHEDULER:
                     break;
