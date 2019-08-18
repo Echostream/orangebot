@@ -1,6 +1,8 @@
 package com.echostream.orangebot;
 
 import com.echostream.orangebot.dto.common.IResponse;
+import lombok.ToString;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.junit.Test;
 
 import java.util.regex.Matcher;
@@ -34,6 +36,14 @@ public class CommanTests {
         IResponse response = IResponse.success("ok");
         System.out.println(response);
 
+    }
+
+    @Test
+    public void testJasypt() {
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        textEncryptor.setPassword("123");
+        String password = textEncryptor.encrypt("123");
+        System.out.println("password: "+password);
     }
 
 }
