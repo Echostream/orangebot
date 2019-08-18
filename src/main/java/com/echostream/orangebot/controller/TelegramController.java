@@ -1,31 +1,18 @@
 package com.echostream.orangebot.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.echostream.orangebot.api.TelegramApi;
 import com.echostream.orangebot.dto.telegram.MessageDto;
 import com.echostream.orangebot.dto.telegram.UpdateDto;
-import com.echostream.orangebot.dto.telegram.request.SentMessageDto;
 import com.echostream.orangebot.enums.TgCmdEnum;
 import com.echostream.orangebot.exception.ForbiddenException;
-import com.echostream.orangebot.exception.InternalErrorException;
+import com.echostream.orangebot.service.SchedulerSrv;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import retrofit2.Call;
-import retrofit2.Response;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -34,40 +21,25 @@ import java.util.Optional;
 public class TelegramController {
     @Value("${telegram.bot.token}")
     private String botToken;
-    @Value("${telegram.bot.name}")
-    private String botName;
 
-    @Autowired
-    private TelegramApi telegramApi;
+    @Resource
+    SchedulerSrv schedulerSrv;
 
     @ApiOperation("telegram消息监听")
     @PostMapping("listener/{token}")
     public String listener(@PathVariable("token") String token,
                            @Valid @RequestBody UpdateDto update) throws IOException {
-        log.info("telegram update: {}",update);
+        log.info("telegram update: {}", update);
         ForbiddenException.isTrue(botToken.equals(token), "路径错误");
         if (update.getMessage() != null) {
             Integer chatId = update.getMessage().getChat().getId();
             Optional<MessageDto.Command> optCommand = update.getMessage().extractCommand();
-            if (!optCommand.isPresent()) {
+            if (!optCommand.isPresent() || !optCommand.get().validateCommand()) {
                 return "ok";
             }
-            MessageDto.Command command = optCommand.get();
-            if (StringUtils.isEmpty(command.getCommand())) {
-                return "ok";
-            }
-            if (!StringUtils.isEmpty(command.getCommandOwner()) && !botName.equals(command.getCommandOwner())) {
-                return "ok";
-            }
-            switch (TgCmdEnum.fromCommand(command.getCommand())) {
+            switch (TgCmdEnum.fromCommand(optCommand.get().getCommand())) {
                 case CLOCK:
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    SentMessageDto sentMessage = new SentMessageDto();
-                    sentMessage.setChatId(chatId);
-                    sentMessage.setText(sdf.format(new Date()));
-                    Call<MessageDto> messageDtoCall = telegramApi.sendMessage(sentMessage);
-                    Response<MessageDto> response = messageDtoCall.execute();
-                    InternalErrorException.isTrue(response.isSuccessful(), response.errorBody().string());
+                    schedulerSrv.clock(chatId);
                     break;
                 case SCHEDULER:
                     break;
@@ -76,4 +48,5 @@ public class TelegramController {
         }
         return "ok";
     }
+
 }

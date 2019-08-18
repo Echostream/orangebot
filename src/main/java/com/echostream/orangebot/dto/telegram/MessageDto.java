@@ -2,6 +2,7 @@ package com.echostream.orangebot.dto.telegram;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
@@ -171,6 +172,8 @@ public class MessageDto {
 
     @Data
     public static class Command {
+        @Value("${telegram.bot.name}")
+        private String botName;
         private final static Pattern commandPattern = Pattern.compile("^(/[a-z0-9_]*)?(@[a-z0-9_]+)?(.*)$");
 
         private String command;
@@ -187,6 +190,14 @@ public class MessageDto {
                 this.commandParams = cmdMatcher.group(3);
             }
         }
+
+        public boolean validateCommand(){
+            if (StringUtils.isEmpty(command)) {
+                return false;
+            }
+            return StringUtils.isEmpty(commandOwner) || botName.equals(commandOwner);
+        }
+
     }
 
 }

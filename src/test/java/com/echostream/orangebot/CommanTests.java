@@ -43,7 +43,7 @@ public class CommanTests {
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
         textEncryptor.setPassword("123");
         String password = textEncryptor.encrypt("123");
-        System.out.println("password: "+password);
+        System.out.println("password: " + password);
     }
 
 }
