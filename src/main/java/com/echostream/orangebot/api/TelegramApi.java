@@ -8,7 +8,7 @@ import retrofit2.http.POST;
 
 public interface TelegramApi {
 
-    @POST("/sendMessage")
+    @POST("sendMessage")
     Call<MessageDto> sendMessage(@Body SentMessageDto message);
 
 }
